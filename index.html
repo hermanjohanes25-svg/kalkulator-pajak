@@ -1,102 +1,40 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Kalkulator Pajak Sederhana</title>
-
-<style>
-body{
-font-family: Arial;
-background:#f4f6f9;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-}
-
-.container{
-background:white;
-padding:30px;
-border-radius:10px;
-box-shadow:0 0 10px rgba(0,0,0,0.1);
-width:350px;
-text-align:center;
-}
-
-h2{
-margin-bottom:20px;
-}
-
-input{
-width:100%;
-padding:10px;
-margin:10px 0;
-border-radius:5px;
-border:1px solid #ccc;
-}
-
-button{
-width:100%;
-padding:10px;
-background:#007BFF;
-color:white;
-border:none;
-border-radius:5px;
-cursor:pointer;
-}
-
-button:hover{
-background:#0056b3;
-}
-
-.result{
-margin-top:20px;
-font-size:18px;
-font-weight:bold;
-}
-</style>
+<title>Kalkulator PPh21</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <div class="container">
-<h2>Kalkulator Pajak TULUS TAMPUBOLON</h2>
+<h1>Kalkulator Pajak PPh 21</h1>
 
-<label>Penghasilan (Rp)</label>
-<input type="number" id="penghasilan" placeholder="Masukkan penghasilan">
+<label>Gaji Bulanan (Rp)</label>
+<input type="number" id="gaji">
+
+<label>Status PTKP</label>
+<select id="status">
+<option value="54000000">TK/0 - Tidak Kawin</option>
+<option value="58500000">K/0 - Kawin</option>
+<option value="63000000">K/1</option>
+<option value="67500000">K/2</option>
+<option value="72000000">K/3</option>
+</select>
 
 <button onclick="hitungPajak()">Hitung Pajak</button>
 
-<div class="result" id="hasil"></div>
+<div class="hasil">
+<p>Pajak Tahunan :</p>
+<h2 id="pajak"></h2>
+<p>Pajak Bulanan :</p>
+<h2 id="pajakBulanan"></h2>
 </div>
 
-<script>
-function hitungPajak(){
+</div>
 
-let penghasilan = document.getElementById("penghasilan").value;
-
-if(penghasilan == ""){
-document.getElementById("hasil").innerHTML="Masukkan penghasilan";
-return;
-}
-
-let pajak = 0;
-
-// contoh perhitungan sederhana
-if(penghasilan <= 50000000){
-pajak = penghasilan * 0.05;
-}
-else if(penghasilan <= 250000000){
-pajak = penghasilan * 0.15;
-}
-else{
-pajak = penghasilan * 0.25;
-}
-
-document.getElementById("hasil").innerHTML =
-"Pajak yang harus dibayar: Rp " + pajak.toLocaleString();
-}
-</script>
+<script src="script.js"></script>
 
 </body>
 </html>
