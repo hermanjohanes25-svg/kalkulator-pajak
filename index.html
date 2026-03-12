@@ -2,35 +2,101 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kalkulator Pajak</title>
-<link rel="stylesheet" href="style.css">
+<title>Kalkulator Pajak Sederhana</title>
+
+<style>
+body{
+font-family: Arial;
+background:#f4f6f9;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.container{
+background:white;
+padding:30px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+width:350px;
+text-align:center;
+}
+
+h2{
+margin-bottom:20px;
+}
+
+input{
+width:100%;
+padding:10px;
+margin:10px 0;
+border-radius:5px;
+border:1px solid #ccc;
+}
+
+button{
+width:100%;
+padding:10px;
+background:#007BFF;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+button:hover{
+background:#0056b3;
+}
+
+.result{
+margin-top:20px;
+font-size:18px;
+font-weight:bold;
+}
+</style>
 </head>
 
 <body>
 
 <div class="container">
+<h2>Kalkulator Pajak</h2>
 
-<h1>Kalkulator Pajak</h1>
-<p class="subtitle">Simulasi Perhitungan Pajak</p>
-
-<div class="card">
-
-<label>Penghasilan Tahunan (Rp)</label>
-<input type="number" id="income" placeholder="Masukkan penghasilan">
+<label>Penghasilan (Rp)</label>
+<input type="number" id="penghasilan" placeholder="Masukkan penghasilan">
 
 <button onclick="hitungPajak()">Hitung Pajak</button>
 
-<div class="result">
-<p>Pajak Terutang</p>
-<h2 id="taxResult">Rp 0</h2>
+<div class="result" id="hasil"></div>
 </div>
 
-</div>
+<script>
+function hitungPajak(){
 
-</div>
+let penghasilan = document.getElementById("penghasilan").value;
 
-<script src="script.js"></script>
+if(penghasilan == ""){
+document.getElementById("hasil").innerHTML="Masukkan penghasilan";
+return;
+}
+
+let pajak = 0;
+
+// contoh perhitungan sederhana
+if(penghasilan <= 50000000){
+pajak = penghasilan * 0.05;
+}
+else if(penghasilan <= 250000000){
+pajak = penghasilan * 0.15;
+}
+else{
+pajak = penghasilan * 0.25;
+}
+
+document.getElementById("hasil").innerHTML =
+"Pajak yang harus dibayar: Rp " + pajak.toLocaleString();
+}
+</script>
 
 </body>
 </html>
