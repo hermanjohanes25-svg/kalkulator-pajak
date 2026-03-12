@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Kalkulator PPh21</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+<h1>Kalkulator Pajak PPh 21</h1>
+
+<label>Gaji Bulanan (Rp)</label>
+<input type="number" id="gaji">
+
+<label>Status PTKP</label>
+<select id="status">
+<option value="54000000">TK/0 - Tidak Kawin</option>
+<option value="58500000">K/0 - Kawin</option>
+<option value="63000000">K/1</option>
+<option value="67500000">K/2</option>
+<option value="72000000">K/3</option>
+</select>
+
+<button onclick="hitungPajak()">Hitung Pajak</button>
+
+<div class="hasil">
+<p>Pajak Tahunan :</p>
+<h2 id="pajak"></h2>
+<p>Pajak Bulanan :</p>
+<h2 id="pajakBulanan"></h2>
+</div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
