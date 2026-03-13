@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Kalkulator PPh21 Indonesia</title>
+
+<style>
+
+body{
+font-family: "Segoe UI", Arial;
+background:#f2f5f9;
+margin:0;
+}
+
+header{
+background:#003a8f;
+color:white;
+padding:18px;
+text-align:center;
+}
+
+.container{
+max-width:900px;
+margin:30px auto;
+}
+
+.card{
+background:white;
+padding:25px;
+border-radius:10px;
+box-shadow:0 3px 10px rgba(0,0,0,0.1);
+margin-bottom:20px;
+}
+
+h3{
+margin-top:0;
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+}
+
+label{
+font-weight:600;
+font-size:14px;
+}
+
+input,select{
+width:100%;
+padding:10px;
+margin-top:6px;
+border:1px solid #ccc;
+border-radius:6px;
+}
+
+button{
+background:#0056b3;
+color:white;
+border:none;
+padding:12px;
+margin-top:15px;
+width:100%;
+font-size:16px;
+border-radius:6px;
+cursor:pointer;
+}
+
+button:hover{
+background:#003f82;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:15px;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:10px;
+}
+
+th{
+background:#f3f3f3;
+text-align:left;
+}
+
+footer{
+text-align:center;
+margin:30px;
+color:#666;
+}
+
+@media(max-width:700px){
+.grid{
+grid-template-columns:1fr;
+}
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>Kalkulator Pajak PPh21</h2>
+<p>Simulasi Perhitungan Pajak Penghasilan Karyawan</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<h3>Data Penghasilan</h3>
+
+<div class="grid">
+
+<div>
+<label>Gaji Pokok Bulanan</label>
+<input type="number" id="gaji">
+</div>
+
+<div>
+<label>Tunjangan Bulanan</label>
+<input type="number" id="tunjangan" value="0">
+</div>
+
+<div>
+<label>Bonus / THR Tahunan</label>
+<input type="number" id="bonus" value="0">
+</div>
+
+<div>
+<label>Status PTKP</label>
+<select id="status">
+<option value="54000000">TK/0</option>
+<option value="58500000">TK/1</option>
+<option value="63000000">TK/2</option>
+<option value="67500000">TK/3</option>
+<option value="58500000">K/0</option>
+<option value="63000000">K/1</option>
+<option value="67500000">K/2</option>
+<option value="72000000">K/3</option>
+</select>
+</div>
+
+</div>
+
+<button onclick="hitung()">Hitung Pajak</button>
+
+</div>
+
+<div class="card">
+
+<h3>Hasil Perhitungan</h3>
+
+<div id="hasil"></div>
+
+</div>
+
+</div>
+
+<footer>
+Simulasi Pajak Penghasilan Indonesia
+</footer>
+
+<script>
+
+function hitung(){
+
+let gaji = Number(document.getElementById("gaji").value) || 0
+let tunjangan = Number(document.getElementById("tunjangan").value) || 0
+let bonus = Number(document.getElementById("bonus").value) || 0
+let ptkp = Number(document.getElementById("status").value)
+
+let brutoBulanan = gaji + tunjangan
+let brutoTahunan = brutoBulanan * 12 + bonus
+
+let biayaJabatan = Math.min(brutoBulanan * 0.05, 500000) * 12
+
+let netTahunan = brutoTahunan - biayaJabatan
+
+let pkp = netTahunan - ptkp
+
+if(pkp < 0) pkp = 0
+
+let pajak = 0
+
+if(pkp <= 60000000){
+pajak = pkp * 0.05
+}
+
+else if(pkp <= 250000000){
+pajak = (60000000 * 0.05) +
+((pkp - 60000000) * 0.15)
+}
+
+else if(pkp <= 500000000){
+pajak = (60000000 * 0.05) +
+(190000000 * 0.15) +
+((pkp - 250000000) * 0.25)
+}
+
+else{
+pajak = (60000000 * 0.05) +
+(190000000 * 0.15) +
+(250000000 * 0.25) +
+((pkp - 500000000) * 0.30)
+}
+
+let bulanan = pajak / 12
+
+document.getElementById("hasil").innerHTML = `
+
+<table>
+
+<tr>
+<th>Komponen</th>
+<th>Jumlah</th>
+</tr>
+
+<tr>
+<td>Penghasilan Bruto Tahunan</td>
+<td>Rp ${brutoTahunan.toLocaleString()}</td>
+</tr>
+
+<tr>
+<td>Biaya Jabatan</td>
+<td>Rp ${biayaJabatan.toLocaleString()}</td>
+</tr>
+
+<tr>
+<td>Penghasilan Neto</td>
+<td>Rp ${netTahunan.toLocaleString()}</td>
+</tr>
+
+<tr>
+<td>PTKP</td>
+<td>Rp ${ptkp.toLocaleString()}</td>
+</tr>
+
+<tr>
+<td>PKP</td>
+<td>Rp ${pkp.toLocaleString()}</td>
+</tr>
+
+<tr>
+<td>PPh21 Tahunan</td>
+<td><b>Rp ${pajak.toLocaleString()}</b></td>
+</tr>
+
+<tr>
+<td>PPh21 Bulanan</td>
+<td><b>Rp ${bulanan.toLocaleString()}</b></td>
+</tr>
+
+</table>
+`
+
+}
+
+</script>
+
+</body>
+</html>
