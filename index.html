@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+<title>HR Payroll System Bonita</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+
+body{
+font-family:Segoe UI;
+background:#eef2f7;
+margin:0;
+}
+
+header{
+background:#0b3d91;
+color:white;
+padding:20px;
+text-align:center;
+}
+
+.container{
+max-width:1000px;
+margin:auto;
+padding:20px;
+}
+
+.card{
+background:white;
+padding:25px;
+border-radius:10px;
+box-shadow:0 4px 10px rgba(0,0,0,0.08);
+margin-bottom:20px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+}
+
+label{
+font-weight:600;
+}
+
+input,select{
+width:100%;
+padding:10px;
+border:1px solid #ccc;
+border-radius:6px;
+margin-top:5px;
+}
+
+button{
+background:#1a73e8;
+color:white;
+border:none;
+padding:12px;
+border-radius:6px;
+margin-top:15px;
+cursor:pointer;
+}
+
+button:hover{
+background:#0c54b8;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:10px;
+}
+
+th{
+background:#f5f5f5;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h2>HR Payroll PPh21 System</h2>
+<p>Simulasi Payroll + Pajak + BPJS</p>
+
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<h3>Data Karyawan</h3>
+
+<div class="grid">
+
+<div>
+<label>Nama</label>
+<input id="nama">
+</div>
+
+<div>
+<label>Status PTKP</label>
+<select id="status">
+<option>TK/0</option>
+<option>TK/1</option>
+<option>TK/2</option>
+<option>TK/3</option>
+<option>K/0</option>
+<option>K/1</option>
+<option>K/2</option>
+<option>K/3</option>
+</select>
+</div>
+
+<div>
+<label>Gaji Pokok</label>
+<input type="number" id="gaji">
+</div>
+
+<div>
+<label>Tunjangan</label>
+<input type="number" id="tunjangan" value="0">
+</div>
+
+<div>
+<label>Lembur</label>
+<input type="number" id="lembur" value="0">
+</div>
+
+<div>
+<label>Bonus / THR</label>
+<input type="number" id="bonus" value="0">
+</div>
+
+</div>
+
+<button onclick="hitungPayroll()">Hitung Payroll</button>
+
+<button onclick="downloadPDF()">Export Slip Gaji PDF</button>
+
+</div>
+
+<div class="card">
+
+<h3>Hasil Payroll</h3>
+
+<div id="hasil"></div>
+
+</div>
+
+</div>
+
+<script>
+
+/* =========================
+AUTO DETEKSI TER
+========================= */
+
+function kategoriTER(status){
+
+if(status.startsWith("TK")) return "A"
+
+if(status==="K/0" || status==="K/1" || status==="K/2") return "B"
+
+if(status==="K/3") return "C"
+
+}
+
+/* =========================
+TARIF TER SEDERHANA
+========================= */
+
+function tarifTER(gaji){
+
+if(gaji<=5400000) return 0
+if(gaji<=5650000) return 0.0025
+if(gaji<=5950000) return 0.005
+if(gaji<=6300000) return 0.0075
+if(gaji<=6750000) return 0.01
+if(gaji<=7500000) return 0.0125
+if(gaji<=8550000) return 0.015
+if(gaji<=9650000) return 0.0175
+if(gaji<=10050000) return 0.02
+
+return 0.025
+
+}
+
+/* =========================
+BPJS
+========================= */
+
+function hitungBPJS(gaji){
+
+return {
+
+kesehatan_karyawan:gaji*0.01,
+kesehatan_perusahaan:gaji*0.04,
+
+jht_karyawan:gaji*0.02,
+jht_perusahaan:gaji*0.037,
+
+jp_karyawan:gaji*0.01,
+jp_perusahaan:gaji*0.02,
+
+jkk:gaji*0.0024,
+jkm:gaji*0.003
+
+}
+
+}
+
+/* =========================
+PAYROLL
+========================= */
+
+function hitungPayroll(){
+
+let nama=document.getElementById("nama").value
+let status=document.getElementById("status").value
+
+let gaji=Number(document.getElementById("gaji").value)||0
+let tunjangan=Number(document.getElementById("tunjangan").value)||0
+let lembur=Number(document.getElementById("lembur").value)||0
+let bonus=Number(document.getElementById("bonus").value)||0
+
+let bruto=gaji+tunjangan+lembur
+
+let bpjs=hitungBPJS(bruto)
+
+let kategori=kategoriTER(status)
+
+let rate=tarifTER(bruto)
+
+let pajak=bruto*rate
+
+let takehome=bruto
+-bpjs.kesehatan_karyawan
+-bpjs.jht_karyawan
+-bpjs.jp_karyawan
+-pajak
+
+document.getElementById("hasil").innerHTML=
+
+`
+
+<table>
+
+<tr><th>Nama</th><td>${nama}</td></tr>
+
+<tr><th>Status PTKP</th><td>${status}</td></tr>
+
+<tr><th>Gaji + Tunjangan + Lembur</th><td>Rp ${bruto.toLocaleString()}</td></tr>
+
+<tr><th>BPJS Kesehatan (1%)</th><td>Rp ${bpjs.kesehatan_karyawan.toLocaleString()}</td></tr>
+
+<tr><th>BPJS JHT (2%)</th><td>Rp ${bpjs.jht_karyawan.toLocaleString()}</td></tr>
+
+<tr><th>BPJS JP (1%)</th><td>Rp ${bpjs.jp_karyawan.toLocaleString()}</td></tr>
+
+<tr><th>PPh21 TER</th><td>Rp ${pajak.toLocaleString()}</td></tr>
+
+<tr><th>Take Home Pay</th><td><b>Rp ${takehome.toLocaleString()}</b></td></tr>
+
+</table>
+
+`
+
+}
+
+/* =========================
+PDF SLIP GAJI
+========================= */
+
+function downloadPDF(){
+
+const { jsPDF } = window.jspdf
+
+let doc=new jsPDF()
+
+doc.text("Slip Gaji Karyawan",20,20)
+
+doc.text(document.getElementById("hasil").innerText,20,40)
+
+doc.save("slip_gaji.pdf")
+
+}
+
+</script>
+
+</body>
+</html>
