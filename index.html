@@ -1,82 +1,162 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+  <meta charset="UTF-8">
   <title>Dashboard Tenaga Kerja</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
-    body { font-family: Arial; padding: 20px; }
-    h1 { text-align: center; }
-    .card {
-      display: inline-block;
-      padding: 15px;
-      margin: 10px;
-      background: #f4f4f4;
-      border-radius: 10px;
-      width: 200px;
-      text-align: center;
-      font-weight: bold;
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background: #f5f7fb;
     }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px;}
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center;}
-    th { background: #eee; }
+
+    header {
+      background: #1e3a8a;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      padding: 20px;
+      border-radius: 12px;
+      color: white;
+      font-size: 18px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .total { background: #2563eb; }
+    .masuk { background: #16a34a; }
+    .keluar { background: #dc2626; }
+    .kurang { background: #f59e0b; }
+
+    .chart-box {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th {
+      background: #1e3a8a;
+      color: white;
+      padding: 10px;
+    }
+
+    td {
+      padding: 8px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+    }
+
+    tr:hover {
+      background: #f1f5f9;
+    }
   </style>
 </head>
+
 <body>
 
-<h1>Dashboard Tenaga Kerja</h1>
+<header>📊 Dashboard Tenaga Kerja</header>
 
-<div id="cards"></div>
+<div class="container">
 
-<canvas id="chart"></canvas>
+  <!-- KPI -->
+  <div class="cards" id="cards"></div>
 
-<table id="table"></table>
+  <!-- Chart -->
+  <div class="chart-box">
+    <canvas id="lineChart"></canvas>
+  </div>
+
+  <div class="chart-box">
+    <canvas id="barChart"></canvas>
+  </div>
+
+  <!-- Table -->
+  <table id="table"></table>
+
+</div>
 
 <script>
 const API = "https://script.google.com/macros/s/AKfycbyeh_7t2i_JJGe5YP8TM26l7z1a8RyWSBY9nsKVJRfhC7MMleIcVZXSmfSl9RAUlSFj/exec";
 
 fetch(API)
-  .then(res => res.json())
-  .then(data => {
+.then(res => res.json())
+.then(data => {
 
-    // ===== AMBIL DATA TERAKHIR =====
-    let last = data[data.length - 1];
+  let last = data[data.length - 1];
 
-    // ===== CARD SUMMARY =====
-    document.getElementById("cards").innerHTML = `
-      <div class="card">Total: ${last.Total}</div>
-      <div class="card">Masuk: ${last.Masuk}</div>
-      <div class="card">Keluar: ${last.Keluar}</div>
-      <div class="card">Kebutuhan: ${last.Kebutuhan}</div>
-      <div class="card">Kekurangan: ${last.Kekurangan}</div>
-    `;
+  // KPI
+  document.getElementById("cards").innerHTML = `
+    <div class="card total">Total<br><h2>${last.Total}</h2></div>
+    <div class="card masuk">Masuk<br><h2>${last.Masuk}</h2></div>
+    <div class="card keluar">Keluar<br><h2>${last.Keluar}</h2></div>
+    <div class="card kurang">Kekurangan<br><h2>${last.Kekurangan}</h2></div>
+  `;
 
-    // ===== TABLE =====
-    let table = document.getElementById("table");
-    let headers = Object.keys(data[0]);
+  // Data chart
+  const labels = data.map(d => d.Tanggal);
+  const total = data.map(d => d.Total);
+  const masuk = data.map(d => d.Masuk);
+  const keluar = data.map(d => d.Keluar);
 
-    table.innerHTML += "<tr>" + headers.map(h => `<th>${h}</th>`).join("") + "</tr>";
-
-    data.forEach(row => {
-      table.innerHTML += "<tr>" + headers.map(h => `<td>${row[h]}</td>`).join("") + "</tr>";
-    });
-
-    // ===== CHART =====
-    const labels = data.map(d => d.Tanggal);
-    const total = data.map(d => d.Total);
-
-    new Chart(document.getElementById("chart"), {
-      type: 'line',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Total Tenaga Kerja',
-          data: total,
-          borderWidth: 2
-        }]
-      }
-    });
-
+  // Line Chart
+  new Chart(document.getElementById("lineChart"), {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: 'Total', data: total, borderWidth: 2 },
+      ]
+    }
   });
+
+  // Bar Chart
+  new Chart(document.getElementById("barChart"), {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: 'Masuk', data: masuk },
+        { label: 'Keluar', data: keluar }
+      ]
+    }
+  });
+
+  // Table
+  let table = document.getElementById("table");
+  let headers = Object.keys(data[0]);
+
+  table.innerHTML += "<tr>" + headers.map(h => `<th>${h}</th>`).join("") + "</tr>";
+
+  data.forEach(row => {
+    table.innerHTML += "<tr>" + headers.map(h => `<td>${row[h]}</td>`).join("") + "</tr>";
+  });
+
+});
 </script>
 
 </body>
