@@ -1,45 +1,38 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
 <meta charset="UTF-8">
 <title>Dashboard Multi Sheet</title>
 
 <style>
-body {
-  font-family: Arial;
-  padding: 20px;
-  background: #f5f5f5;
-}
-
-h1 {
-  text-align: center;
-}
+body { font-family: Arial; padding:20px; background:#f5f5f5;}
+h1 { text-align:center; }
 
 select {
-  padding: 10px;
-  margin-bottom: 15px;
+  padding:10px;
+  margin-bottom:15px;
 }
 
 table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
+  width:100%;
+  border-collapse:collapse;
+  background:white;
 }
 
 th, td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  text-align: center;
+  border:1px solid #ccc;
+  padding:8px;
+  text-align:center;
 }
 
 th {
-  background: #333;
-  color: white;
+  background:#333;
+  color:white;
 }
 
 .status {
-  margin-bottom: 10px;
-  font-weight: bold;
+  margin-bottom:10px;
+  font-weight:bold;
 }
 </style>
 
@@ -49,7 +42,7 @@ th {
 
 <h1>Dashboard Tenaga Kerja</h1>
 
-<div class="status" id="status">⏳ Loading data...</div>
+<div class="status" id="status">⏳ Loading...</div>
 
 <select id="sheetSelect"></select>
 
@@ -57,8 +50,8 @@ th {
 
 <script>
 
-// 🔴 GANTI DENGAN URL API KAMU
-const API = "https://script.google.com/macros/s/AKfycbxVqTE84jSZkDt5uxUuHOmtSsb3N2q5AO3KncaqheGGwwoAEavZtUwvw9Ghp7othNPuYw/exec";
+// 🔴 GANTI DENGAN URL API BARU
+const API = "https://script.google.com/macros/s/AKfycbyS65iL9bCzmhFzUY2QlhEssGKOdYsMs9Y869GSsHlUed3jJyf-34nOh_uW2zJXMKsvnw/exec";
 
 fetch(API)
 .then(res => res.json())
@@ -68,11 +61,11 @@ fetch(API)
   const select = document.getElementById("sheetSelect");
   const table = document.getElementById("table");
 
-  console.log("DATA API:", data);
+  console.log("DATA:", data);
 
-  // ❌ CEK DATA KOSONG
+  // VALIDASI DATA
   if (!data || Object.keys(data).length === 0) {
-    status.innerHTML = "❌ DATA TIDAK DITEMUKAN";
+    status.innerHTML = "❌ DATA TIDAK ADA";
     return;
   }
 
@@ -80,28 +73,24 @@ fetch(API)
 
   const sheetNames = Object.keys(data);
 
-  // isi dropdown
+  // dropdown
+  select.innerHTML = "";
   sheetNames.forEach(name => {
     select.innerHTML += `<option value="${name}">${name}</option>`;
   });
 
-  // fungsi render tabel
   function render(sheetName) {
-
     const sheetData = data[sheetName];
 
-    // ❌ jika sheet kosong
     if (!sheetData || sheetData.length === 0) {
-      table.innerHTML = "<tr><td>❌ DATA KOSONG DI SHEET INI</td></tr>";
+      table.innerHTML = "<tr><td>❌ DATA KOSONG</td></tr>";
       return;
     }
 
     const headers = Object.keys(sheetData[0]);
 
-    // header tabel
     table.innerHTML = "<tr>" + headers.map(h => `<th>${h}</th>`).join("") + "</tr>";
 
-    // isi tabel
     sheetData.forEach(row => {
       table.innerHTML += "<tr>" +
         headers.map(h => `<td>${row[h] ?? '-'}</td>`).join("") +
@@ -109,12 +98,8 @@ fetch(API)
     });
   }
 
-  // event dropdown
-  select.addEventListener("change", function(){
-    render(this.value);
-  });
+  select.onchange = () => render(select.value);
 
-  // tampilkan pertama
   render(sheetNames[0]);
 
 })
